@@ -1,11 +1,35 @@
 import requests
 import urllib.parse
-
+import tkinter as tk
+from tkinter import messagebox
 
 route_url = "https://graphhopper.com/api/1/route?"
-key = "4caed6f6-18ac-4de3-98e3-20bcd961a0a0"
+# this sets up the window dimensions
+root = tk.Tk()
+root.geometry("900x600")
+root.title("GPS")
+root.configure(background="light blue")
 
-    
+#this will set up the border for the information
+app_Frame = tk.Frame(root, padx=20,pady=40)
+app_Frame.pack(padx=20,pady=40,fill=tk.BOTH, expand=True)
+app_Frame.configure(background="light green")
+
+#this sets up the labels for the input blocks
+startLocation = tk.Label(app_Frame, text="Starting location:")
+startLocation.grid(row=0,column=0, sticky=tk.W)
+startLocationInput = tk.Entry(app_Frame)
+startLocationInput.grid(row=0,column=1,padx=20,pady=0)
+
+stopLocation = tk.Label(app_Frame, text="Stop location:")
+stopLocation.grid(row=1,column=0, sticky=tk.W)
+stopLocationInput = tk.Entry(app_Frame)
+stopLocationInput.grid(row=1,column=1,padx=20,pady=5)
+
+
+
+key = "257d99b4-a47b-40f5-8301-befc94c854af"
+
 def geocoding (location, key):
     while location == "":
         location = input("Enter the location again: ")
@@ -15,8 +39,8 @@ def geocoding (location, key):
     replydata = requests.get(url)
     json_data = replydata.json()
     json_status = replydata.status_code
-    
     if json_status == 200 and len(json_data["hits"]) !=0:
+        json_data = requests.get(url).json()
         lat=(json_data["hits"][0]["point"]["lat"])
         lng=(json_data["hits"][0]["point"]["lng"])
         name = json_data["hits"][0]["name"]
@@ -40,15 +64,13 @@ def geocoding (location, key):
             new_loc = name
         
         print("Geocoding API URL for " + new_loc + " (Location Type: " + value + ")\n" + url)
-
     else:
         lat="null"
         lng="null"
         new_loc=location
         if json_status != 200:
-            print("Geocode API status: " + str(json_status) + "\nError message: " + json_data["message"])        
+            print("Geocode API status: " + str(json_status) + "\nError message: " + json_data["message"])
     return json_status,lat,lng,new_loc
-
 while True:
     print("\n+++++++++++++++++++++++++++++++++++++++++++++")
     print("Vehicle profiles available on Graphhopper:")
@@ -64,7 +86,6 @@ while True:
     else: 
         vehicle = "car"
         print("No valid vehicle profile was entered. Using the car profile.")
-
     loc1 = input("Starting Location: ")
     if loc1 == "quit" or loc1 == "q":
         break
@@ -81,28 +102,23 @@ while True:
         paths_status = requests.get(paths_url).status_code
         paths_data = requests.get(paths_url).json()
         print("Routing API Status: " + str(paths_status) + "\nRouting API URL:\n" + paths_url)
-    print("=================================================")
-    print("Directions from " + orig[3] + " to " + dest[3] + " by " + vehicle)
-    print("=================================================")
-    if paths_status == 200:
-        miles = (paths_data["paths"][0]["distance"])/1000/1.61
-        km = (paths_data["paths"][0]["distance"])/1000
-        sec = int(paths_data["paths"][0]["time"]/1000%60)
-        min = int(paths_data["paths"][0]["time"]/1000/60%60)
-        hr = int(paths_data["paths"][0]["time"]/1000/60/60)
-        print("Distance Traveled: {0:.1f} miles / {1:.1f} km".format(miles, km))
-        print("Trip Duration: {0:02d}:{1:02d}:{2:02d}".format(hr, min, sec))
         print("=================================================")
-        for each in range(len(paths_data["paths"][0]["instructions"])):
-            path = paths_data["paths"][0]["instructions"][each]["text"]
-            distance = paths_data["paths"][0]["instructions"][each]["distance"]
-            print("{0} ( {1:.1f} km / {2:.1f} miles )".format(path, distance/1000, distance/1000/1.61))
+        print("Directions from " + orig[3] + " to " + dest[3] + " by " + vehicle)
         print("=================================================")
-    else:
-        print("Error message: " + paths_data["message"])
-        print("*********************************************")
-
-
-
-    
-    
+        if paths_status == 200:
+            miles = (paths_data["paths"][0]["distance"])/1000/1.61
+            km = (paths_data["paths"][0]["distance"])/1000
+            sec = int(paths_data["paths"][0]["time"]/1000%60)
+            min = int(paths_data["paths"][0]["time"]/1000/60%60)
+            hr = int(paths_data["paths"][0]["time"]/1000/60/60)
+            print("Distance Traveled: {0:.1f} miles / {1:.1f} km".format(miles, km))
+            print("Trip Duration: {0:02d}:{1:02d}:{2:02d}".format(hr, min, sec))
+            print("=================================================")
+            for each in range(len(paths_data["paths"][0]["instructions"])):
+                path = paths_data["paths"][0]["instructions"][each]["text"]
+                distance = paths_data["paths"][0]["instructions"][each]["distance"]
+                print("{0} ( {1:.1f} km / {2:.1f} miles )".format(path, distance/1000, distance/1000/1.61))
+            print("=============================================")
+        else:
+            print("Error message: " + paths_data["message"])
+            print("*************************************************")
