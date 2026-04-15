@@ -28,7 +28,7 @@ stopLocationInput.grid(row=1,column=1,padx=20,pady=5)
 
 
 
-key = "257d99b4-a47b-40f5-8301-befc94c854af"
+key = ""
 
 def geocoding (location, key):
     while location == "":
