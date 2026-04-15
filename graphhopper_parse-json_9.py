@@ -31,7 +31,7 @@ mode = "car"
 answer = tk.Text(root, state="disabled")
 answer.pack(fill="both",expand = True)
 
-key = "257d99b4-a47b-40f5-8301-befc94c854af"
+key = ""
 
 #prints onto the GUI
 def printOnGUI(*args, sep=" ", end="\n"):
